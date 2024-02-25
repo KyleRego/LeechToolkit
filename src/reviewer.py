@@ -13,7 +13,7 @@ import aqt.reviewer
 from anki import hooks
 from aqt.utils import showInfo, tooltip
 from aqt.webview import WebContent, AnkiWebView
-from aqt import gui_hooks, mw
+from aqt import gui_hooks, mw ,QAction ,QMenu
 from aqt.reviewer import Reviewer
 from aqt.qt import QShortcut, QKeySequence
 
@@ -23,7 +23,7 @@ from .config import LeechToolkitConfigManager, merge_fields
 from .consts import (
     ANKI_LEGACY_VER,
     ANKI_UNDO_UPDATE_VER,
-    CURRENT_ANKI_VER,
+    CURRENT_ANKI_VER,ANKI_23_10,
     Config,
     ErrorMsg,
     MARKER_ID, MARKER_POS_STYLES,
@@ -37,6 +37,8 @@ try:
 except ImportError:
     print(f'{traceback.format_exc()}\n{ErrorMsg.MODULE_NOT_FOUND_LEGACY}')
     DeckId = int
+
+from ..custom_shige import shigeLeech_return,shigeLeech_reset
 
 PREV_TYPE_ATTR = 'prevtype'
 WRAPPER_ATTR = 'toolkit_manager'
@@ -114,7 +116,7 @@ class ReviewWrapper:
             leech_seq = QKeySequence(self.toolkit_config[Config.SHORTCUT_OPTIONS][Config.LEECH_SHORTCUT])
             leech_shortcut = QShortcut(leech_seq, mw, lambda *args: self.handle_input_action(Config.LEECH_ACTIONS))
 
-            self.leech_action = aqt.qt.QAction(String.REVIEWER_ACTION_LEECH, mw)
+            self.leech_action = QAction(String.REVIEWER_ACTION_LEECH, mw) # 修正 aqt.qt.QAction
             self.leech_action.setShortcut(leech_seq)
             self.leech_action.triggered.connect(lambda *args: self.handle_input_action(Config.LEECH_ACTIONS))
             mw.stateShortcuts.append(leech_shortcut)
@@ -126,7 +128,7 @@ class ReviewWrapper:
                 lambda *args: self.handle_input_action(Config.UN_LEECH_ACTIONS)
             )
 
-            self.unleech_action = aqt.qt.QAction(String.REVIEWER_ACTION_UNLEECH, mw)
+            self.unleech_action = QAction(String.REVIEWER_ACTION_UNLEECH, mw) # 修正 aqt.qt.QAction
             self.unleech_action.setShortcut(unleech_seq)
             self.unleech_action.triggered.connect(lambda *args: self.handle_input_action(Config.UN_LEECH_ACTIONS))
             mw.stateShortcuts.append(unleech_shortcut)
@@ -186,7 +188,10 @@ class ReviewWrapper:
         """
         Appends hooks to the current reviewer.
         """
-        from anki.hooks import card_did_leech
+        try:
+            from anki.hooks import card_did_leech
+        except:
+            pass
         from aqt.gui_hooks import (
             reviewer_did_show_question,
             reviewer_did_show_answer,
@@ -235,7 +240,7 @@ class ReviewWrapper:
         if not reviewer.card:
             reviewer.card = card
 
-    def append_context_menu(self, webview: AnkiWebView, menu: aqt.qt.QMenu):
+    def append_context_menu(self, webview: AnkiWebView, menu: QMenu): # 修正 QMenu
         for action in menu.actions():
             if action.text() in (String.REVIEWER_ACTION_LEECH, String.REVIEWER_ACTION_UNLEECH):
                 menu.removeAction(action)
@@ -246,9 +251,13 @@ class ReviewWrapper:
     def remove_hooks(self):
         try:
             gui_hooks.reviewer_did_answer_card.remove(self.on_answer_v3)
-            hooks.card_did_leech.remove(self.save_leech)
+            try:
+                hooks.card_did_leech.remove(self.save_leech)
+            except:
+                pass
         except NameError:
             print(ErrorMsg.ACTION_MANAGER_NOT_DEFINED)
+            raise NameError
 
         gui_hooks.reviewer_did_show_question.remove(self.on_show_front)
         gui_hooks.reviewer_did_show_answer.remove(self.on_show_back)
@@ -256,12 +265,13 @@ class ReviewWrapper:
 
     def handle_card_updates(self, card: anki.cards.Card, update_callback, undo_msg=None):
         current_data = {
-            'queue': card.queue.real,
-            'due': card.due.real,
+            'queue': card.queue.real, # suspend,New
+            'due': card.due.real, # 期日
             'lapses': card.lapses,
             'fields': card.note().joined_fields() if CURRENT_ANKI_VER > ANKI_LEGACY_VER else card.note().joinedFields(),
             'tags': card.note().tags,
         }
+
         updated_card = update_callback()
         updated_data = {
             'queue': updated_card.queue.real,
@@ -271,7 +281,11 @@ class ReviewWrapper:
             'tags': updated_card.note().tags,
         }
 
-        if current_data != updated_data:
+        if (current_data != updated_data # なぜかFalseになる(ﾚﾋﾞｭｰ中)
+                                            # Supendを有効にすると実行される
+            or (ANKI_23_10 and shigeLeech_return())): # 追加
+            if ANKI_23_10: shigeLeech_reset() # 追加
+
             if CURRENT_ANKI_VER < ANKI_UNDO_UPDATE_VER:
                 updated_card.flush()
                 updated_card.note().flush()

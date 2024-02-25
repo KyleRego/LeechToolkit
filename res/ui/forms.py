@@ -35,13 +35,14 @@ if CURRENT_QT_VER == 6:
     QSizePolicy.Preferred = QSizePolicy.Policy.Preferred
 
 
+
 class ElidingLabel(QLabel):
     _contents: str
     _elided_text: str
     elision_changed = pyqtSignal(bool)
     is_elided = False
 
-    def __init__(self, text='', mode: Qt.TextElideMode = Qt.ElideRight, **kwargs):
+    def __init__(self, text='', mode: Qt.TextElideMode = Qt.TextElideMode.ElideRight, **kwargs):
         """
         QLabel with automatic elision based on the label's minimum size.
 
@@ -50,7 +51,7 @@ class ElidingLabel(QLabel):
         """
         super().__init__()
         self._mode = mode
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.setText(text)
 
     def setText(self, text: str):
@@ -91,7 +92,6 @@ class ElidingLabel(QLabel):
                 else:
                     # noinspection PyTypeChecker
                     line.draw(painter, QPoint(0, 0))
-
             else:
                 self._elided_text = metrics.elidedText(self._contents, self._mode, self.width())
                 painter.drawText(QPoint(0, metrics.ascent()), self._elided_text)
@@ -108,8 +108,8 @@ class QueueSpinBox(QSpinBox):
     _ref_methods = (QueueAction.TOP, QueueAction.BOTTOM)
     dropdown = QComboBox()
 
-    def __int__(self, *args):
-        super.__init__(*args)
+    def __init__(self, *args): #🐞修正 __int__ -> __init__
+        super().__init__(*args) #🐞修正 super. -> super().
 
     def textFromValue(self, val):
         if self.dropdown.currentIndex() in self._ref_methods:
@@ -151,7 +151,8 @@ class TipSlider(QSlider):
         x_offset, y_offset = ((rect_handle.width() * 1.5) * -1), -30
         x = rect_handle.right() + (self.sliderPosition() * self.rect().width() / 101) + x_offset
         y = rect_handle.top() + y_offset
-        global_pos = self.mapToGlobal(QPoint(x, y))
+        # global_pos = self.mapToGlobal(QPoint(x, y))
+        global_pos = self.mapToGlobal(QPoint(int(x), int(y)))
         # noinspection PyArgumentList
         QToolTip.showText(global_pos, f'{self.value()}%')
 
@@ -183,7 +184,7 @@ class CustomCompleter(QCompleter):
         self.line_edit = parent_line_edit
 
         self.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        self.setFilterMode(Qt.MatchContains)
+        self.setFilterMode(Qt.MatchFlag.MatchContains)
         self.setCompletionPrefix(' ')
 
         def focus_event(event):

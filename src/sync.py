@@ -89,7 +89,8 @@ def sync_collection(is_manual_sync=False):
             except KeyError:
                 all_conf = mw.col.decks.all_config()
                 try:
-                    for deck_conf in [all_conf]:
+                    # for deck_conf in [all_conf]: #🐞 修正
+                    for deck_conf in all_conf: #🐞 修正
                         if deck_conf['id'] == key:
                             thresholds[key] = deck_conf['lapse']['leechFails']
 
@@ -116,12 +117,25 @@ def sync_collection(is_manual_sync=False):
                 if toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_ENABLED]:
                     card.lapses = max(get_remeasured_lapses(cid, toolkit_config[Config.REVERSE_OPTIONS]), 0)
 
+                # ---------------------------------------------------------------------
+                # if card.lapses != lapses:
+                #     updated_cids.add(cid)
+                
+                # threshold = thresholds[str(did)] \
+                #     if toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_USE_LEECH_THRESHOLD] \
+                #     else toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_THRESHOLD]
+                # ---------------------------------------------------------------------
+                # 🐞sync_collection threshold = thresholds[str(did)] KeyError: '1699663030089'
+
                 if card.lapses != lapses:
                     updated_cids.add(cid)
 
-                threshold = thresholds[str(did)] \
-                    if toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_USE_LEECH_THRESHOLD] \
-                    else toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_THRESHOLD]
+                if toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_USE_LEECH_THRESHOLD]:
+                    # threshold = (thresholds[str(did)])
+                    threshold = thresholds.get(str(did), DEFAULT_THRESHOLD) #🐞修正 ｴﾗｰが起きたら初期値を入れる
+                else:
+                    threshold = toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_THRESHOLD]
+                # ---------------------------------------------------------------------
 
                 note = card.note()
                 if CURRENT_ANKI_VER <= ANKI_SYNC_ISSUE_VER:

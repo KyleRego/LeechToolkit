@@ -1,0 +1,22 @@
+{
+    "deploy.reloaded": {
+        "packages": [
+            {
+                "name": "Add on",
+                "description": "Add on",
+                "files": [
+                    "/**"
+                ]
+            }
+        ],
+        "targets": [
+            {
+                "type": "local",
+                "name": "My Anki addons21 folder",
+                "description": "My Anki addons21 folder",
+
+                "dir": "/path_to_your/Anki2/addons21/leech_toolkit"
+            }
+        ]
+    }
+}

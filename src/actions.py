@@ -37,6 +37,7 @@ try:
 except (ModuleNotFoundError, ImportError):
     print(f'{traceback.format_exc()}\n{ErrorMsg.MODULE_NOT_FOUND_LEGACY}')
 
+from ..custom_shige import shigeLeech_update
 
 def apply_tag_macros(card: anki.cards.Card, tag: str):
     """
@@ -201,17 +202,23 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
                 updated_card.odue = 0
             if actions_conf[Action.MOVE_DECK][Action.INPUT]:
                 updated_card.did = int(actions_conf[Action.MOVE_DECK][Action.INPUT])  # updated_card.col.decks.id()
+                # updated_card.col.update_card(updated_card) # ｺﾚすると更新されるが違う
+
 
     def handle_flag():
         if actions_conf[Action.FLAG][Action.ENABLED]:
             if CURRENT_ANKI_VER <= ANKI_LEGACY_VER:
                 updated_card.setUserFlag(actions_conf[Action.FLAG][Action.INPUT])
             else:
+                # updated_card.set_user_flag(actions_conf[Action.FLAG][Action.INPUT]) # 修正
                 updated_card.set_user_flag(actions_conf[Action.FLAG][Action.INPUT])
+                shigeLeech_update()
+                # updated_card.col.set_user_flag_for_cards(actions_conf[Action.FLAG][Action.INPUT],[updated_card.id]) #やっぱ修正しない
 
     def handle_suspend():
         if actions_conf[Action.SUSPEND][Action.ENABLED] and actions_conf[Action.SUSPEND][Action.INPUT]:
             updated_card.queue = QUEUE_TYPE_SUSPENDED
+            shigeLeech_update()
 
     def handle_add_tags():
         if actions_conf[Action.ADD_TAGS][Action.ENABLED]:
@@ -220,6 +227,7 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
                     updated_card.note().addTag(apply_tag_macros(updated_card, tag))
                 else:
                     updated_card.note().add_tag(apply_tag_macros(updated_card, tag))
+                    shigeLeech_update()
 
     def handle_remove_tags():
         if actions_conf[Action.REMOVE_TAGS][Action.ENABLED]:
@@ -236,6 +244,7 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
                     if CURRENT_ANKI_VER > ANKI_LEGACY_VER:
                         result_tags = ''.join(re.split(reg_string, updated_card.note().string_tags())).strip()
                         updated_card.note().set_tags_from_str(result_tags)
+                        shigeLeech_update()
                     else:
                         result_tags = ''.join(re.split(reg_string, updated_card.note().stringTags())).strip()
                         updated_card.note().setTagsFromStr(result_tags)
@@ -243,6 +252,7 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
                 else:
                     if CURRENT_ANKI_VER > ANKI_LEGACY_VER:
                         updated_card.note().remove_tag(formatted_tag)
+                        shigeLeech_update()
                     else:
                         updated_card.note().delTag(formatted_tag)
 
@@ -250,16 +260,19 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
         if actions_conf[Action.FORGET][Action.ENABLED] and actions_conf[Action.FORGET][Action.INPUT][0]:
             if updated_card.odid:
                 updated_card.odid = 0
+                shigeLeech_update()
             if actions_conf[Action.FORGET][Action.INPUT][1]:
                 updated_card.odue = 0
+                shigeLeech_update()
             if actions_conf[Action.FORGET][Action.INPUT][2]:
                 updated_card.reps = 0
                 updated_card.lapses = 0
+                shigeLeech_update()
 
     def handle_edit_fields():
         if actions_conf[Action.EDIT_FIELDS][Action.ENABLED]:
             inputs: list[str] = [list(input_dict.keys())[0] for input_dict in
-                                 actions_conf[Action.EDIT_FIELDS][Action.INPUT]]
+                                actions_conf[Action.EDIT_FIELDS][Action.INPUT]]
 
             for nid in inputs:
                 # nid = int(filtered_nid.split('.')[0])
@@ -279,6 +292,7 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
                         card_field = new_text.join(re.split(conf_meta[EditAction.REPL], card_field))
 
                     updated_card.note().fields[conf_meta[EditAction.FIELD]] = card_field
+                    shigeLeech_update()
 
     def handle_reschedule():
         if actions_conf[Action.RESCHEDULE][Action.ENABLED]:
@@ -287,12 +301,14 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
             days = random.randrange(from_days, to_days) if from_days < to_days else random.randrange(to_days, from_days)
             delta = datetime.timedelta(days=days)
             updated_card.due = int((datetime.datetime.now() + delta).timestamp())
+            shigeLeech_update()
 
             if actions_conf[Action.RESCHEDULE][Action.INPUT][RescheduleAction.RESET]:
                 updated_card.ivl = delta.days
 
     def handle_add_to_queue():
         if actions_conf[Action.ADD_TO_QUEUE][Action.ENABLED]:
+            shigeLeech_update()
             queue_inputs = actions_conf[Action.ADD_TO_QUEUE][Action.INPUT]
 
             def get_inserted_pos(insert_type, input_pos):
@@ -417,6 +433,7 @@ def handle_actions(card: anki.cards.Card, toolkit_conf: dict, action_type=Config
         Attaches the custom leech tag based on user preferences.
         """
         if toolkit_conf[Config.SYNC_TAG_OPTIONS][Config.SYNC_TAG_ENABLED]:
+            shigeLeech_update()
             if action_type == Config.LEECH_ACTIONS:
                 if CURRENT_ANKI_VER > ANKI_LEGACY_VER:
                     updated_card.note().add_tag(toolkit_conf[Config.SYNC_TAG_OPTIONS][Config.SYNC_TAG_TEXT])

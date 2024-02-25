@@ -241,7 +241,7 @@ class SetLapseDialog(QDialog):
         self.ui.setupUi(SetLapseDialog=self)
 
         def on_text_changed(text: str):
-            self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(re.search(r'\d', text.strip()) is not None)
+            self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(re.search(r'\d', text.strip()) is not None)
 
         self.ui.lineEdit.textChanged.connect(on_text_changed)
 

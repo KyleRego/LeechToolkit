@@ -171,14 +171,14 @@ def append_restore_button(parent: QWidget, insert_col=4):
         parent.default_button.setFlat(True)
         parent.default_button.setToolTip(String.RESTORE_DEFAULT_SETTING)
 
-        size_policy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        size_policy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(parent.default_button.sizePolicy().hasHeightForWidth())
+        # size_policy.setHeightForWidth(parent.default_button.sizePolicy().hasHeightForWidth())
         parent.default_button.setSizePolicy(size_policy)
 
         pixmap = QPixmap(f'{Path(__file__).parent.resolve()}\\{RESTORE_ICON_PATH}')
-        mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskOutColor)
+        mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskMode.MaskOutColor)
         # pixmap.fill(QColor('#adadad' if mw.pm.night_mode() else '#1a1a1a'))
         pixmap.fill(QColor('#adadad'))
         pixmap.setMask(mask)
@@ -397,7 +397,7 @@ def _add_list_item(list_widget: QListWidget, list_item: QListWidgetItem, item_wi
     :param item_widget: QWidget to use for the list item's UI
     """
     list_item.setSizeHint(item_widget.sizeHint())
-    list_item.setFlags(Qt.NoItemFlags)
+    list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
     list_widget.addItem(list_item)
     list_widget.setItemWidget(list_item, item_widget)
@@ -411,8 +411,8 @@ def _redraw_list(list_widget: QListWidget, max_height=256):
     :param max_height: optional maximum size to stop at
     """
     data_height = list_widget.sizeHintForRow(0) * list_widget.count()
-    list_widget.setFixedHeight(data_height if data_height < max_height else list_widget.maximumHeight())
-    list_widget.setMaximumWidth(list_widget.parent().maximumWidth())
+    list_widget.setFixedHeight(int(data_height if data_height < max_height else list_widget.maximumHeight()))#🐞修正 int
+    list_widget.setMaximumWidth(int(list_widget.parent().maximumWidth()))#🐞修正 int
     list_widget.setVisible(list_widget.count() != 0)
     # noinspection PyUnresolvedReferences
     list_widget.currentRowChanged.emit(list_widget.currentRow())  # Used for updating any change receivers
@@ -510,7 +510,9 @@ class OptionsDialog(QDialog):
         self.manager = manager
         self.config = manager.config
         self.ui = Ui_OptionsDialog()
-        if int(QT_VERSION_STR.split('.')[1]) < QT5_MARKDOWN_VER:
+        if (int(QT_VERSION_STR.split('.')[1]) < QT5_MARKDOWN_VER
+        and CURRENT_QT_VER == 5 # 修正
+        ):
             self.ui.QTCore = aqt.qt
             self.ui.QTCore.Qt = aqt.qt.Qt
             self.ui.QTCore.Qt.MarkdownText = AutoText
@@ -533,18 +535,20 @@ class OptionsDialog(QDialog):
         self.restore_buttons.append(append_restore_button(self.ui.shortcutsGroupbox))
         self.restore_buttons.append(append_restore_button(self.ui.markHtmlGroupbox))
 
-        self.apply_button = self.ui.buttonBox.button(QDialogButtonBox.Apply)
+        self.apply_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         self.apply_button.setEnabled(False)
 
-        self.ui.buttonBox.button(QDialogButtonBox.Apply).clicked.connect(self.apply)
-        self.ui.buttonBox.button(QDialogButtonBox.RestoreDefaults).clicked.connect(self.restore_defaults)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.RestoreDefaults).clicked.connect(self.restore_defaults)
 
+        from ..custom_shige import check_exec
         self.ui.leechShortcutButton.clicked.connect(
-            lambda *args: self.ShortcutHandler(self, self.ui.leechShortcutButton).exec_()
+            lambda *args: check_exec(self.ShortcutHandler(self, self.ui.leechShortcutButton)) # 修正
         )
         self.ui.unleechShortcutButton.clicked.connect(
-            lambda *args: self.ShortcutHandler(self, self.ui.unleechShortcutButton).exec_()
+            lambda *args: check_exec(self.ShortcutHandler(self, self.ui.unleechShortcutButton)) # 修正
         )
+
         tab_width = QFontMetrics(self.ui.markHtmlTextEdit.font()).horizontalAdvance('    ')
         self.ui.markHtmlTextEdit.setTabStopDistance(tab_width)
 
@@ -641,9 +645,9 @@ class OptionsDialog(QDialog):
             setup_restore_button(*args)
 
         signal_lists = list(global_signals.values()) \
-                       + list(self.leech_form.get_signals().values()) \
-                       + list(self.unleech_form.get_signals().values()) \
-                       + list(self.reverse_form.get_signals().values())
+                        + list(self.leech_form.get_signals().values()) \
+                        + list(self.unleech_form.get_signals().values()) \
+                        + list(self.reverse_form.get_signals().values())
 
         for signals in signal_lists:
             self._append_apply_signals(signals)
@@ -741,8 +745,8 @@ class OptionsDialog(QDialog):
         self.ui.about_label_header.setText(updated_about_header)
 
         # Allow link navigation
-        self.ui.about_label_body.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.ui.about_label_header.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.ui.about_label_body.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        self.ui.about_label_header.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
 
         # Convert markdown to HTML and update
         self.ui.about_label_header.setText(markdown.markdown(self.ui.about_label_header.text()))
@@ -851,7 +855,7 @@ class ReverseWidget(QWidget):
         the widget
         """
         super().__init__(parent=None, flags=flags)
-        self.ui = Ui_ReverseForm()
+        self.ui = Ui_ReverseForm() # 🐛
         self.ui.setupUi(self)
 
         title = self.ui.reverseGroup.title() + (f' {String.GLOBAL_SUFFIX}' if global_conf else '')
@@ -952,9 +956,10 @@ class ActionsWidget(QWidget):
             doc_height = text_box.document().size().height()
             max_height, min_height = 256, 24
             if doc_height <= max_height:
-                text_box.setFixedHeight(min_height if doc_height <= min_height else doc_height + 5)
+                # text_box.setFixedHeight(min_height if doc_height <= min_height else doc_height + 5)
+                text_box.setFixedHeight(int(min_height if doc_height <= min_height else doc_height + 5))#🐞修正
             else:
-                text_box.setFixedHeight(max_height)
+                text_box.setFixedHeight(int(max_height))#🐞修正
 
         self.ui.queueExcludeTextEdit.textChanged.connect(lambda *args: update_text_size(self.ui.queueExcludeTextEdit))
 
@@ -1134,8 +1139,12 @@ class ActionsWidget(QWidget):
             if CURRENT_ANKI_VER > ANKI_LEGACY_VER:
                 flag = flag_manager.get_flag(index)
                 pixmap = QPixmap(flag.icon.path)
-                mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskOutColor)
-                pixmap.fill(QColor(flag.icon.current_color(mw.pm.night_mode())))
+                mask = pixmap.createMaskFromColor(QColor('black'), Qt.MaskMode.MaskOutColor)
+                try:
+                    from aqt.utils import theme_manager
+                    pixmap.fill(QColor(flag.icon.current_color(theme_manager.night_mode)))
+                except:
+                    pixmap.fill(QColor(flag.icon.current_color(mw.pm.night_mode())))
                 pixmap.setMask(mask)
                 self.ui.flagDropdown.setItemIcon(index, QIcon(pixmap))
                 self.ui.flagDropdown.setItemText(index, f'{flag.label}')
@@ -1228,7 +1237,8 @@ class ActionsWidget(QWidget):
         self.ui.queueSimilarCheckbox.setChecked(queue_input[QueueAction.NEAR_SIMILAR])
         self.ui.queueExcludeTextEdit.setText(queue_input[QueueAction.EXCLUDED_TEXT])
         self.ui.queueIncludeFieldsCheckbox.setChecked(queue_input[QueueAction.INCLUSIVE_FIELDS])
-        self.ui.queueRatioSlider.setValue(queue_input[QueueAction.SIMILAR_RATIO] * 100)
+        # self.ui.queueRatioSlider.setValue(queue_input[QueueAction.SIMILAR_RATIO] * 100)
+        self.ui.queueRatioSlider.setValue(int(queue_input[QueueAction.SIMILAR_RATIO] * 100))#🐞修正
 
         self.ui.queueExcludedFieldList.clear()
         for note_dict in queue_input[QueueAction.FILTERED_FIELDS]:
