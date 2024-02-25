@@ -134,8 +134,8 @@ class QueueSpinBox(QSpinBox):
 
 
 class TipSlider(QSlider):
-    def __init__(self, *args):
-        super(QSlider, self).__init__(*args)
+    def __init__(self, parent, *args):
+        super(QSlider, self).__init__(parent, *args)
         self.style = aqt.mw.style()
         self.opt = QStyleOptionSlider()
 
