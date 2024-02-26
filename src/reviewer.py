@@ -186,7 +186,6 @@ class ReviewWrapper:
         """
         Appends hooks to the current reviewer.
         """
-        from anki.hooks import card_did_leech
         from aqt.gui_hooks import (
             reviewer_did_show_question,
             reviewer_did_show_answer,
@@ -197,6 +196,7 @@ class ReviewWrapper:
         if CURRENT_ANKI_VER > ANKI_LEGACY_VER and mw.col.v3_scheduler():
             reviewer_did_answer_card.append(self.on_answer_v3)
         else:
+            from anki.hooks import card_did_leech
             card_did_leech.append(self.save_leech)
             reviewer_did_answer_card.append(self.on_answer)
 
