@@ -246,7 +246,8 @@ class ReviewWrapper:
     def remove_hooks(self):
         try:
             gui_hooks.reviewer_did_answer_card.remove(self.on_answer_v3)
-            hooks.card_did_leech.remove(self.save_leech)
+            if not (CURRENT_ANKI_VER > ANKI_LEGACY_VER and mw.col.v3_scheduler()):
+                hooks.card_did_leech.remove(self.save_leech)
         except NameError:
             print(ErrorMsg.ACTION_MANAGER_NOT_DEFINED)
 
