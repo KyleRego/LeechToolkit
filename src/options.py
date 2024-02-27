@@ -95,6 +95,7 @@ from ..res.ui.exclude_field_item import Ui_ExcludedFieldItem
 from ..res.ui.forms import CustomCompleter
 from ..res.ui.options_dialog import Ui_OptionsDialog
 from ..res.ui.reverse_form import Ui_ReverseForm
+from ..res.ui.lapse_review_ratio_form import Ui_LapseReviewRatioForm
 
 try:
     import aqt.flags
@@ -521,6 +522,9 @@ class OptionsDialog(QDialog):
         self.reverse_form = ReverseWidget(flags=mw.windowFlags(), restore_buttons=self.restore_buttons)
         self.ui.optionsScrollLayout.addWidget(self.reverse_form)
 
+        self.lapse_review_ratio_form = LapseReviewRatioWidget(flags=mw.windowFlags())
+        self.ui.optionsScrollLayout.addWidget(self.lapse_review_ratio_form)
+
         self.leech_form = ActionsWidget(Config.LEECH_ACTIONS, restore_buttons=self.restore_buttons)
         self.ui.actionsScrollLayout.addWidget(self.leech_form)
 
@@ -900,6 +904,16 @@ class ReverseWidget(QWidget):
         reverse_config[Config.REVERSE_USE_LEECH_THRESHOLD] = self.ui.useLeechThresholdCheckbox.isChecked()
         reverse_config[Config.REVERSE_THRESHOLD] = self.ui.reverseThresholdSpinbox.value()
         reverse_config[Config.REVERSE_CONS_ANS] = self.ui.consAnswerSpinbox.value()
+
+
+class LapseReviewRatioWidget(QWidget):
+    def __init__(self, flags):
+        """
+        Widget for lapse review ratio info and options
+        """
+        super().__init__(parent=None, flags=flags)
+        self.ui = Ui_LapseReviewRatioForm()
+        self.ui.setupUi(self)
 
 
 class ActionsWidget(QWidget):
