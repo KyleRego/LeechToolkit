@@ -866,6 +866,7 @@ class ReverseWidget(QWidget):
         super().__init__(parent=None, flags=flags)
         self.ui = Ui_ReverseForm()
         self.ui.setupUi(self)
+        self.setMinimumHeight(150)
 
         title = self.ui.reverseGroup.title() + (f' {String.GLOBAL_SUFFIX}' if global_conf else '')
         self.ui.reverseGroup.setTitle(title)
@@ -923,6 +924,7 @@ class LapseReviewRatioWidget(QWidget):
         super().__init__(parent=None, flags=flags)
         self.ui = Ui_LapseReviewRatioWidget()
         self.ui.setupUi(self)
+        self.setMinimumHeight(100)
 
     def write(self, lapse_review_ratio_config: dict):
         feature_enabled = self.ui.lapseReviewRatioForm.isChecked()
