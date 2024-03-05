@@ -95,7 +95,7 @@ from ..res.ui.exclude_field_item import Ui_ExcludedFieldItem
 from ..res.ui.forms import CustomCompleter
 from ..res.ui.options_dialog import Ui_OptionsDialog
 from ..res.ui.reverse_form import Ui_ReverseForm
-from ..res.ui.lapse_review_ratio_form import Ui_LapseReviewRatioForm
+from ..res.ui.lapse_review_ratio_widget import Ui_LapseReviewRatioWidget
 
 try:
     import aqt.flags
@@ -826,18 +826,27 @@ class OptionsDialog(QDialog):
         """
         Write all options.
         """
+        # These three are in the Advanced tab
         self.config[Config.TOOLBAR_ENABLED] = self.ui.toolsOptionsCheckBox.isChecked()
         self.config[Config.TOAST_ENABLED] = self.ui.toastCheckbox.isChecked()
         self.config[Config.SYNC_ENABLED] = self.ui.syncUpdateCheckbox.isChecked()
 
+        # Leech Mark group, first under General
         self.write_marker(self.config[Config.MARKER_OPTIONS])
+
+        # Bottom Bar Position, second under General
         self.write_button(self.config[Config.BUTTON_OPTIONS])
+
+        # These three are in advanced tab
         self.write_sync_tag(self.config[Config.SYNC_TAG_OPTIONS])
         self.write_shortcuts(self.config[Config.SHORTCUT_OPTIONS])
         self.write_mark_html()
 
+        # Leech Actions and Un-Leech Actions in the Actions tab
         self.leech_form.write_all(self.config[Config.LEECH_ACTIONS])
         self.unleech_form.write_all(self.config[Config.UN_LEECH_ACTIONS])
+
+        # Lapse Reverse, third under General
         self.reverse_form.write(self.config[Config.REVERSE_OPTIONS])
 
         # Save config
@@ -909,11 +918,15 @@ class ReverseWidget(QWidget):
 class LapseReviewRatioWidget(QWidget):
     def __init__(self, flags):
         """
-        Widget for lapse review ratio info and options
+        Widget for lapse review ratio options
         """
         super().__init__(parent=None, flags=flags)
-        self.ui = Ui_LapseReviewRatioForm()
+        self.ui = Ui_LapseReviewRatioWidget()
         self.ui.setupUi(self)
+
+    def write(self, lapse_review_ratio_config: dict):
+        feature_enabled = self.ui.lapseReviewRatioForm.isChecked()
+        lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_FEATURE_ENABLED] = feature_enabled
 
 
 class ActionsWidget(QWidget):
