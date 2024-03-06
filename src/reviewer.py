@@ -187,16 +187,22 @@ class ReviewWrapper:
 
     def append_lrr_html(self):
         html_to_add = f"""
-            <div id="{LRR_HTML_ID}" style="width: 50%; background: red; display: none">
+            <div style="position: fixed; bottom: 0; left: 0; right: 0; width: 320px; margin: auto">
+                <div id="{LRR_HTML_ID}"
+                    style="background: red;
+                    color: black;
+                    display: none"
+                >
+                </div>
             </div>
         """
 
         self.content.body += html_to_add
 
     def show_lrr_html(self, ratio):
-        lrr_text = f"lapse review ratio: {ratio}"
-        mw.web.eval(f'document.getElementById("{MARKER_ID}").style.display = "block";')
-        mw.web.eval(f'document.getElementById("{MARKER_ID}").textContent = "{lrr_text}";')
+        lrr_text = f"LR ratio: {ratio}"
+        mw.web.eval(f'document.getElementById("{LRR_HTML_ID}").style.display = "block";')
+        mw.web.eval(f'document.getElementById("{LRR_HTML_ID}").textContent = "{lrr_text}";')
 
     def append_hooks(self):
         """
