@@ -62,6 +62,7 @@ REV_DECREASE = ReverseType(0)
 REV_RESET = ReverseType(1)
 
 MARKER_ID = 'leech_marker'
+LRR_HTML_ID = "lapse_review_ratio_html_id"
 
 MARKER_HTML_TEMP = f'''<style>
     #{MARKER_ID} {{
@@ -357,7 +358,7 @@ class Config:
         },
         LAPSE_REVIEW_RATIO_OPTIONS: {
             LAPSE_REVIEW_RATIO_FEATURE_ENABLED: True,
-            LAPSE_REVIEW_RATIO_THRESHOLD: 0.8,
+            LAPSE_REVIEW_RATIO_THRESHOLD: 0.015,
         },
         TOAST_ENABLED: True,
         TOOLTIP_TIME: 5000,

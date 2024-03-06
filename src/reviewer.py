@@ -27,9 +27,11 @@ from .consts import (
     Config,
     ErrorMsg,
     MARKER_ID, MARKER_POS_STYLES,
+    LRR_HTML_ID,
     LEECH_TAG,
     MARKER_HTML_TEMP, ROOT_DIR, String,
 )
+from .lapse_review_ratio import calculations
 
 try:
     from anki.decks import DeckId
@@ -146,6 +148,7 @@ class ReviewWrapper:
         self.toolkit_config = merge_fields(global_conf.get(str(deck_conf_dict['id']), {}), global_conf)
 
         self.append_marker_html()
+        self.append_lrr_html()
         self.append_hooks()
 
     def refresh_if_needed(self, changes: aqt.reviewer.OpChanges):
@@ -156,7 +159,7 @@ class ReviewWrapper:
         """
         self.reviewer.op_executed(changes=changes, handler=self, focused=True)
         if not self.reviewer.refresh_if_needed():
-            self.update_marker()
+            self.update_card_html()
 
     def marker_html(self):
         out_html = MARKER_HTML_TEMP
@@ -181,6 +184,19 @@ class ReviewWrapper:
         """
 
         self.content.body += self.marker_html()
+
+    def append_lrr_html(self):
+        html_to_add = f"""
+            <div id="{LRR_HTML_ID}" style="width: 50%; background: red; display: none">
+            </div>
+        """
+
+        self.content.body += html_to_add
+
+    def show_lrr_html(self, ratio):
+        lrr_text = f"lapse review ratio: {ratio}"
+        mw.web.eval(f'document.getElementById("{MARKER_ID}").style.display = "block";')
+        mw.web.eval(f'document.getElementById("{MARKER_ID}").textContent = "{lrr_text}";')
 
     def append_hooks(self):
         """
@@ -352,7 +368,7 @@ class ReviewWrapper:
         self.card = card
         if self.toolkit_config[Config.REVERSE_OPTIONS][Config.REVERSE_ENABLED]:
             setattr(self.card, PREV_TYPE_ATTR, self.card.type)
-        self.update_marker()
+        self.update_card_html()
 
     def on_show_front(self, card: anki.cards.Card):
         """
@@ -362,7 +378,7 @@ class ReviewWrapper:
         """
         self.on_front = True
         self.card = card
-        self.update_marker()
+        self.update_card_html()
 
     def on_answer(self, context: aqt.reviewer.Reviewer, card: anki.cards.Card, ease: int):
         """
@@ -391,11 +407,13 @@ class ReviewWrapper:
 
         self.handle_card_updates(card, handle_card_answer)
 
-    def update_marker(self):
+    def update_card_html(self):
         """
         Update marker style/visibility based on config options and card attributes.
+        Renamed from update_marker() as it will also do stuff for lapse review ratio features
         """
         marker_conf = self.toolkit_config[Config.MARKER_OPTIONS]
+        lrr_conf = self.toolkit_config[Config.LAPSE_REVIEW_RATIO_OPTIONS]
         show_marker(False)
 
         if marker_conf[Config.SHOW_LEECH_MARKER]:
@@ -414,3 +432,9 @@ class ReviewWrapper:
                 elif marker_conf[Config.USE_ALMOST_MARKER] and almost_leech:
                     set_marker_color(marker_conf[Config.ALMOST_COLOR])
                     show_marker(True)
+
+        if lrr_conf[Config.LAPSE_REVIEW_RATIO_FEATURE_ENABLED]:
+            threshold = float(lrr_conf[Config.LAPSE_REVIEW_RATIO_THRESHOLD])
+            ratio = calculations.lr_ratio_for_card(mw, self.card.id)
+            if (ratio > threshold):
+                self.show_lrr_html(ratio)
