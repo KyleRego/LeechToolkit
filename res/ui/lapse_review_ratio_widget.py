@@ -50,5 +50,5 @@ class Ui_LapseReviewRatioWidget(object):
     def retranslateUi(self, LapseReviewRatioWidget):
         _translate = QtCore.QCoreApplication.translate
         self.lapseReviewRatioGroup.setToolTip(_translate("LapseReviewRatioWidget", "<html><head/><body><p>Configure lapse review ratio threshold</p></body></html>"))
-        self.lapseReviewRatioGroup.setTitle(_translate("LapseReviewRatioWidget", "Lapse Review Ratio Features"))
-        self.lapseReviewRatioLineEditLabel.setText(_translate("LapseReviewRatioWidget", "Set the threshold for showing markers:"))
+        self.lapseReviewRatioGroup.setTitle(_translate("LapseReviewRatioWidget", "Lapse Review Ratio"))
+        self.lapseReviewRatioLineEditLabel.setText(_translate("LapseReviewRatioWidget", "Set a threshold for showing the LR ratio:"))
