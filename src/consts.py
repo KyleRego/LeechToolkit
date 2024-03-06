@@ -253,6 +253,10 @@ class Config:
     REVERSE_THRESHOLD = 'reverseThreshold'
     REVERSE_CONS_ANS = 'reverseConsecutiveAnswers'
 
+    LAPSE_REVIEW_RATIO_OPTIONS = "lapseReviewRatioOptions"
+    LAPSE_REVIEW_RATIO_FEATURE_ENABLED = "lapseReviewRatioFeatureEnabled"
+    LAPSE_REVIEW_RATIO_THRESHOLD = "lapseReviewRatioThreshold"
+
     SET_LAPSES_INPUT = 'setLapseInput'
     SET_LAPSE_UPDATE_LEECHES = 'setLapseUpdateLeeches'
 
@@ -350,6 +354,10 @@ class Config:
             REVERSE_THRESHOLD: 4,
             REVERSE_CONS_ANS: 2,
             REVERSE_METHOD: 0,
+        },
+        LAPSE_REVIEW_RATIO_OPTIONS: {
+            LAPSE_REVIEW_RATIO_FEATURE_ENABLED: True,
+            LAPSE_REVIEW_RATIO_THRESHOLD: 0.8,
         },
         TOAST_ENABLED: True,
         TOOLTIP_TIME: 5000,

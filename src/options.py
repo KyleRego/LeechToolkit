@@ -522,8 +522,8 @@ class OptionsDialog(QDialog):
         self.reverse_form = ReverseWidget(flags=mw.windowFlags(), restore_buttons=self.restore_buttons)
         self.ui.optionsScrollLayout.addWidget(self.reverse_form)
 
-        self.lapse_review_ratio_form = LapseReviewRatioWidget(flags=mw.windowFlags())
-        self.ui.optionsScrollLayout.addWidget(self.lapse_review_ratio_form)
+        self.lapse_review_ratio_widget = LapseReviewRatioWidget(flags=mw.windowFlags())
+        self.ui.optionsScrollLayout.addWidget(self.lapse_review_ratio_widget)
 
         self.leech_form = ActionsWidget(Config.LEECH_ACTIONS, restore_buttons=self.restore_buttons)
         self.ui.actionsScrollLayout.addWidget(self.leech_form)
@@ -849,6 +849,8 @@ class OptionsDialog(QDialog):
         # Lapse Reverse, third under General
         self.reverse_form.write(self.config[Config.REVERSE_OPTIONS])
 
+        self.lapse_review_ratio_widget.write(self.config[Config.LAPSE_REVIEW_RATIO_OPTIONS])
+
         # Save config
         self.manager.save_config()
 
@@ -927,8 +929,9 @@ class LapseReviewRatioWidget(QWidget):
         self.setMinimumHeight(100)
 
     def write(self, lapse_review_ratio_config: dict):
-        feature_enabled = self.ui.lapseReviewRatioForm.isChecked()
+        feature_enabled = self.ui.lapseReviewRatioGroup.isChecked()
         lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_FEATURE_ENABLED] = feature_enabled
+        lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_THRESHOLD] = self.ui.lapseReviewRatioLineEdit.text()
 
 
 class ActionsWidget(QWidget):
