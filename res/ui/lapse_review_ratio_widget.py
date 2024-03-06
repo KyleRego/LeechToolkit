@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'lapse_review_ratio_form.ui'
+# Form implementation generated from reading ui file 'lapse_review_ratio_widget.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -31,16 +31,17 @@ class Ui_LapseReviewRatioWidget(object):
         self.lapseReviewRatioGroup.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignLeft|QtCore.Qt.AlignmentFlag.AlignTop)
         self.lapseReviewRatioGroup.setCheckable(True)
         self.lapseReviewRatioGroup.setObjectName("lapseReviewRatioGroup")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.lapseReviewRatioGroup)
-        self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetMinimumSize)
-        self.verticalLayout_2.setContentsMargins(9, 9, 9, 9)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.lapseReviewRatioLayout = QtWidgets.QVBoxLayout(self.lapseReviewRatioGroup)
+        self.lapseReviewRatioLayout.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetMinimumSize)
+        self.lapseReviewRatioLayout.setContentsMargins(9, 9, 9, 9)
+        self.lapseReviewRatioLayout.setObjectName("lapseReviewRatioLayout")
+        self.lapseReviewRatioLineEditLabel = QtWidgets.QLabel(parent=self.lapseReviewRatioGroup)
+        self.lapseReviewRatioLineEditLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.lapseReviewRatioLineEditLabel.setObjectName("lapseReviewRatioLineEditLabel")
+        self.lapseReviewRatioLayout.addWidget(self.lapseReviewRatioLineEditLabel)
         self.lapseReviewRatioLineEdit = QtWidgets.QLineEdit(parent=self.lapseReviewRatioGroup)
         self.lapseReviewRatioLineEdit.setObjectName("lapseReviewRatioLineEdit")
-        self.verticalLayout_2.addWidget(self.lapseReviewRatioLineEdit)
-        self.lapseReviewRatioLineEditLabel = QtWidgets.QLabel(parent=self.lapseReviewRatioGroup)
-        self.lapseReviewRatioLineEditLabel.setObjectName("lapseReviewRatioLineEditLabel")
-        self.verticalLayout_2.addWidget(self.lapseReviewRatioLineEditLabel, 0, QtCore.Qt.AlignmentFlag.AlignHCenter)
+        self.lapseReviewRatioLayout.addWidget(self.lapseReviewRatioLineEdit)
         self.lapseReviewRatioFormLayout.addWidget(self.lapseReviewRatioGroup)
 
         self.retranslateUi(LapseReviewRatioWidget)
@@ -49,5 +50,5 @@ class Ui_LapseReviewRatioWidget(object):
     def retranslateUi(self, LapseReviewRatioWidget):
         _translate = QtCore.QCoreApplication.translate
         self.lapseReviewRatioGroup.setToolTip(_translate("LapseReviewRatioWidget", "<html><head/><body><p>Configure lapse review ratio threshold</p></body></html>"))
-        self.lapseReviewRatioGroup.setTitle(_translate("LapseReviewRatioWidget", "Lapse Review Ratio"))
-        self.lapseReviewRatioLineEditLabel.setText(_translate("LapseReviewRatioWidget", "Lapse review ratio threshold"))
+        self.lapseReviewRatioGroup.setTitle(_translate("LapseReviewRatioWidget", "Lapse Review Ratio Features"))
+        self.lapseReviewRatioLineEditLabel.setText(_translate("LapseReviewRatioWidget", "Set the threshold for showing markers:"))

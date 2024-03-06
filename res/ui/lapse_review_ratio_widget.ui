@@ -47,7 +47,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Configure lapse review ratio threshold&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="title">
-      <string>Lapse Review Ratio</string>
+      <string>Lapse Review Ratio Features</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -55,7 +55,7 @@
      <property name="checkable">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="lapseReviewRatioLayout">
       <property name="sizeConstraint">
        <enum>QLayout::SetMinimumSize</enum>
       </property>
@@ -72,14 +72,17 @@
        <number>9</number>
       </property>
       <item>
-       <widget class="QLineEdit" name="lapseReviewRatioLineEdit"/>
-      </item>
-      <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="lapseReviewRatioLineEditLabel">
         <property name="text">
-         <string>Lapse review ratio threshold</string>
+         <string>Set the threshold for showing markers:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lapseReviewRatioLineEdit"/>
       </item>
      </layout>
     </widget>

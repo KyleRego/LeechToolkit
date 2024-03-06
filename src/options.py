@@ -929,14 +929,14 @@ class LapseReviewRatioWidget(QWidget):
         self.ui = Ui_LapseReviewRatioWidget()
         self.ui.setupUi(self)
         self.addAvgLrrLabel()
-        self.setMinimumHeight(100)
+        self.setMinimumHeight(120)
 
     def addAvgLrrLabel(self):
         avg = round(calculations.average_lapse_review_ratio(mw), 4)
         avg_text = f"The average per card lapses/reviews in your collection is {avg}."
         avg_text_widget = QLabel(avg_text)
         avg_text_widget.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.ui.verticalLayout_2.addWidget(avg_text_widget)
+        self.ui.lapseReviewRatioLayout.addWidget(avg_text_widget)
 
     def write(self, lapse_review_ratio_config: dict):
         feature_enabled = self.ui.lapseReviewRatioGroup.isChecked()
