@@ -821,6 +821,7 @@ class OptionsDialog(QDialog):
         self.leech_form.load_ui(self.config[Config.LEECH_ACTIONS])
         self.unleech_form.load_ui(self.config[Config.UN_LEECH_ACTIONS])
         self.reverse_form.load_ui(self.config[Config.REVERSE_OPTIONS])
+        self.lapse_review_ratio_widget.load_ui(self.config[Config.LAPSE_REVIEW_RATIO_OPTIONS])
 
     def _write(self):
         """
@@ -931,8 +932,14 @@ class LapseReviewRatioWidget(QWidget):
     def write(self, lapse_review_ratio_config: dict):
         feature_enabled = self.ui.lapseReviewRatioGroup.isChecked()
         lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_FEATURE_ENABLED] = feature_enabled
-        lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_THRESHOLD] = self.ui.lapseReviewRatioLineEdit.text()
+        threshold = self.ui.lapseReviewRatioLineEdit.text()
+        lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_THRESHOLD] = threshold
 
+    def load_ui(self, lapse_review_ratio_config: dict):
+        feature_enabled = lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_FEATURE_ENABLED]
+        self.ui.lapseReviewRatioGroup.setChecked(feature_enabled)
+        threshold = str(lapse_review_ratio_config[Config.LAPSE_REVIEW_RATIO_THRESHOLD])
+        self.ui.lapseReviewRatioLineEdit.setText(threshold)
 
 class ActionsWidget(QWidget):
     def __init__(self, actions_type: str, parent=None, expanded=True, dids=None, restore_buttons: list = None):
