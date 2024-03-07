@@ -199,6 +199,9 @@ class ReviewWrapper:
 
         self.content.body += html_to_add
 
+    def hide_lrr_html(self):
+        mw.web.eval(f'document.getElementById("{LRR_HTML_ID}").style.display = "none";')
+
     def show_lrr_html(self, ratio):
         lrr_text = f"LR ratio: {ratio}"
         mw.web.eval(f'document.getElementById("{LRR_HTML_ID}").style.display = "block";')
@@ -420,6 +423,7 @@ class ReviewWrapper:
         """
         marker_conf = self.toolkit_config[Config.MARKER_OPTIONS]
         lrr_conf = self.toolkit_config[Config.LAPSE_REVIEW_RATIO_OPTIONS]
+        self.hide_lrr_html()
         show_marker(False)
 
         if marker_conf[Config.SHOW_LEECH_MARKER]:
